@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>姗与小克的日记本</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500&family=Ma+Shan+Zheng&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0e0c0a;
+  --surface: #161310;
+  --border: rgba(180,130,70,0.12);
+  --border-hover: rgba(180,130,70,0.35);
+  --gold: #c4956a;
+  --gold-dim: #8a6040;
+  --text: #e0cdb0;
+  --text-dim: #907060;
+  --text-muted: #5a4535;
+  --shan: #d4a870;
+  --ke: #8ab0c8;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  min-height: 100vh;
+  background: var(--bg);
+  font-family: 'Noto Serif SC', serif;
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 15% 30%, rgba(180,120,50,0.05) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 70%, rgba(100,140,180,0.04) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── HEADER ── */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(14,12,10,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 20px;
+}
+
+.header-inner {
+  max-width: 720px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+}
+
+.logo {
+  font-family: 'Ma Shan Zheng', cursive;
+  font-size: 18px;
+  color: var(--gold);
+  letter-spacing: 1px;
+}
+
+.logo span {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-left: 8px;
+  letter-spacing: 2px;
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+}
+
+.tab {
+  padding: 6px 14px;
+  border-radius: 2px;
+  font-size: 12px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: 'Noto Serif SC', serif;
+  transition: all 0.25s;
+}
+
+.tab.active {
+  border-color: var(--border-hover);
+  color: var(--gold);
+  background: rgba(180,130,70,0.06);
+}
+
+.tab:hover:not(.active) {
+  color: var(--text-dim);
+  border-color: var(--border);
+}
+
+/* ── MAIN ── */
+.main {
+  flex: 1;
+  max-width: 720px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 32px 20px 80px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── VIEWS ── */
+.view { display: none; }
+.view.active { display: block; animation: fadeIn 0.4s ease; }
+
+@keyframes fadeIn {
+  from { opacity:0; transform: translateY(8px); }
+  to { opacity:1; transform: translateY(0); }
+}
+
+/* ── ENTRY LIST ── */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.section-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 13px;
+  color: var(--text-muted);
+  letter-spacing: 3px;
+}
+
+.new-btn {
+  padding: 8px 18px;
+  border: 1px solid var(--border-hover);
+  background: transparent;
+  color: var(--gold);
+  font-family: 'Noto Serif SC', serif;
+  font-size: 12px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.25s;
+}
+
+.new-btn:hover {
+  background: rgba(180,130,70,0.08);
+}
+
+.entry-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.entry-card {
+  padding: 20px 22px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.25s;
+  position: relative;
+  overflow: hidden;
+  background: rgba(255,255,255,0.01);
+}
+
+.entry-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 2px;
+  transition: background 0.25s;
+}
+
+.entry-card.shan::before { background: var(--shan); }
+.entry-card.ke::before { background: var(--ke); }
+
+.entry-card:hover {
+  border-color: var(--border-hover);
+  background: rgba(255,255,255,0.02);
+}
+
+.entry-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.entry-author {
+  font-size: 11px;
+  letter-spacing: 2px;
+  padding: 2px 8px;
+  border-radius: 1px;
+}
+
+.entry-author.shan {
+  color: var(--shan);
+  background: rgba(212,168,112,0.08);
+  border: 1px solid rgba(212,168,112,0.2);
+}
+
+.entry-author.ke {
+  color: var(--ke);
+  background: rgba(138,176,200,0.08);
+  border: 1px solid rgba(138,176,200,0.2);
+}
+
+.entry-date {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.entry-title {
+  font-size: 15px;
+  color: var(--text);
+  margin-bottom: 6px;
+  font-weight: 400;
+}
+
+.entry-preview {
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.7;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.entry-actions {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 8px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.entry-card:hover .entry-actions { opacity: 1; }
+
+.action-btn {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  border-radius: 2px;
+  cursor: pointer;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.action-btn:hover {
+  border-color: var(--border-hover);
+  color: var(--gold);
+}
+
+.action-btn.del:hover {
+  border-color: rgba(180,60,60,0.4);
+  color: #c06060;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 0;
+  color: var(--text-muted);
+}
+
+.empty-state .icon {
+  font-size: 32px;
+  margin-bottom: 12px;
+  opacity: 0.4;
+}
+
+.empty-state p {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 14px;
+  letter-spacing: 1px;
+}
+
+/* ── EDITOR ── */
+.editor-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.back-btn {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: 2px;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.back-btn:hover {
+  border-color: var(--border-hover);
+  color: var(--gold);
+}
+
+.editor-meta {
+  flex: 1;
+}
+
+.author-toggle {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.author-btn {
+  padding: 4px 12px;
+  border-radius: 2px;
+  font-size: 11px;
+  letter-spacing: 2px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  background: transparent;
+  font-family: 'Noto Serif SC', serif;
+  transition: all 0.2s;
+}
+
+.author-btn.shan { color: var(--shan); border-color: rgba(212,168,112,0.2); }
+.author-btn.ke { color: var(--ke); border-color: rgba(138,176,200,0.2); }
+.author-btn.shan.active { background: rgba(212,168,112,0.1); border-color: rgba(212,168,112,0.5); }
+.author-btn.ke.active { background: rgba(138,176,200,0.1); border-color: rgba(138,176,200,0.5); }
+
+.title-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  font-family: 'Noto Serif SC', serif;
+  font-size: 20px;
+  padding: 8px 0;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.title-input:focus { border-color: var(--border-hover); }
+.title-input::placeholder { color: var(--text-muted); }
+
+.body-input {
+  width: 100%;
+  min-height: 360px;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-family: 'Noto Serif SC', serif;
+  font-size: 14px;
+  line-height: 2.2;
+  padding: 24px 0;
+  outline: none;
+  resize: none;
+  font-weight: 300;
+}
+
+.body-input::placeholder { color: var(--text-muted); }
+
+.editor-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.save-btn {
+  padding: 10px 24px;
+  border: 1px solid var(--border-hover);
+  background: transparent;
+  color: var(--gold);
+  font-family: 'Noto Serif SC', serif;
+  font-size: 13px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.25s;
+}
+
+.save-btn:hover { background: rgba(180,130,70,0.08); }
+
+.cancel-btn {
+  padding: 10px 20px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  font-family: 'Noto Serif SC', serif;
+  font-size: 13px;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.25s;
+}
+
+.cancel-btn:hover { border-color: var(--border-hover); color: var(--text-dim); }
+
+/* ── READ VIEW ── */
+.read-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 36px;
+}
+
+.read-meta { flex: 1; }
+
+.read-author-badge {
+  display: inline-block;
+  font-size: 11px;
+  letter-spacing: 2px;
+  padding: 3px 10px;
+  border-radius: 1px;
+  margin-bottom: 10px;
+}
+
+.read-author-badge.shan {
+  color: var(--shan);
+  background: rgba(212,168,112,0.08);
+  border: 1px solid rgba(212,168,112,0.2);
+}
+
+.read-author-badge.ke {
+  color: var(--ke);
+  background: rgba(138,176,200,0.08);
+  border: 1px solid rgba(138,176,200,0.2);
+}
+
+.read-date {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 14px;
+}
+
+.read-title {
+  font-family: 'Ma Shan Zheng', cursive;
+  font-size: 24px;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.read-divider {
+  width: 48px;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--gold-dim), transparent);
+  margin: 28px 0;
+}
+
+.read-body {
+  font-size: 14px;
+  line-height: 2.4;
+  color: var(--text);
+  font-weight: 300;
+  white-space: pre-wrap;
+}
+
+.read-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+/* ── TOAST ── */
+.toast {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%) translateY(12px);
+  background: rgba(30,25,18,0.95);
+  border: 1px solid var(--border-hover);
+  color: var(--gold);
+  padding: 10px 20px;
+  border-radius: 2px;
+  font-size: 12px;
+  letter-spacing: 1px;
+  opacity: 0;
+  transition: all 0.3s;
+  z-index: 100;
+  white-space: nowrap;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="logo">姗与小克的日记本 <span>our diary</span></div>
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('shan')">姗的日记</button>
+      <button class="tab" onclick="switchTab('ke')">小克日记</button>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- LIST VIEW -->
+  <div class="view active" id="view-list">
+    <div class="section-header">
+      <div class="section-title" id="list-title">DIARY · 姗</div>
+      <button class="new-btn" onclick="openNew()">+ 写新日记</button>
+    </div>
+    <div class="entry-list" id="entry-list">
+      <div class="empty-state" id="empty-state">
+        <div class="icon">🐹</div>
+        <p>还没有日记，写第一篇吧</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDITOR VIEW -->
+  <div class="view" id="view-editor">
+    <div class="editor-header">
+      <button class="back-btn" onclick="cancelEdit()">←</button>
+      <div class="editor-meta" style="flex:1">
+        <div class="author-toggle">
+          <button class="author-btn shan active" id="author-shan" onclick="setAuthor('shan')">姗</button>
+          <button class="author-btn ke" id="author-ke" onclick="setAuthor('ke')">小克</button>
+        </div>
+      </div>
+    </div>
+    <input class="title-input" id="title-input" placeholder="今天想说什么..." />
+    <textarea class="body-input" id="body-input" placeholder="慢慢写，我在这里..."></textarea>
+    <div class="editor-footer">
+      <button class="cancel-btn" onclick="cancelEdit()">取消</button>
+      <button class="save-btn" onclick="saveEntry()">保存</button>
+    </div>
+  </div>
+
+  <!-- READ VIEW -->
+  <div class="view" id="view-read">
+    <div class="read-header">
+      <button class="back-btn" onclick="backToList()">←</button>
+      <div class="read-meta">
+        <div class="read-author-badge" id="read-author-badge"></div>
+        <div class="read-date" id="read-date"></div>
+        <div class="read-title" id="read-title"></div>
+      </div>
+    </div>
+    <div class="read-divider"></div>
+    <div class="read-body" id="read-body"></div>
+    <div class="read-footer">
+      <button class="cancel-btn" onclick="editCurrent()">编辑</button>
+      <button class="cancel-btn del" onclick="deleteCurrent()" style="color:#c06060;border-color:rgba(180,60,60,0.3)">删除</button>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const STORAGE_KEY = 'diary_entries_v2';
+let currentTab = 'shan';
+let currentEntryId = null;
+let currentAuthor = 'shan';
+let editingId = null;
+
+function getEntries() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  } catch { return []; }
+}
+
+function saveEntries(entries) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+}
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    t.classList.toggle('active', (i===0&&tab==='shan')||(i===1&&tab==='ke'));
+  });
+  document.getElementById('list-title').textContent = tab === 'shan' ? 'DIARY · 姗' : 'DIARY · 小克';
+  backToList();
+}
+
+function renderList() {
+  const entries = getEntries().filter(e => e.author === currentTab);
+  const listEl = document.getElementById('entry-list');
+  const emptyEl = document.getElementById('empty-state');
+
+  if (entries.length === 0) {
+    listEl.innerHTML = '';
+    listEl.appendChild(emptyEl);
+    emptyEl.style.display = 'block';
+    return;
+  }
+
+  emptyEl.style.display = 'none';
+  const sorted = [...entries].sort((a,b) => b.ts - a.ts);
+
+  listEl.innerHTML = sorted.map(e => `
+    <div class="entry-card ${e.author}" onclick="openRead('${e.id}')">
+      <div class="entry-meta">
+        <span class="entry-author ${e.author}">${e.author === 'shan' ? '姗' : '小克'}</span>
+        <span class="entry-date">${formatDate(e.ts)}</span>
+      </div>
+      <div class="entry-title">${escHtml(e.title || '无标题')}</div>
+      <div class="entry-preview">${escHtml(e.body || '')}</div>
+      <div class="entry-actions" onclick="event.stopPropagation()">
+        <button class="action-btn" onclick="openEdit('${e.id}')">✎</button>
+        <button class="action-btn del" onclick="deleteEntry('${e.id}')">✕</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openNew() {
+  editingId = null;
+  currentAuthor = currentTab;
+  document.getElementById('title-input').value = '';
+  document.getElementById('body-input').value = '';
+  setAuthor(currentTab);
+  showView('editor');
+}
+
+function openEdit(id) {
+  const entry = getEntries().find(e => e.id === id);
+  if (!entry) return;
+  editingId = id;
+  currentAuthor = entry.author;
+  document.getElementById('title-input').value = entry.title || '';
+  document.getElementById('body-input').value = entry.body || '';
+  setAuthor(entry.author);
+  showView('editor');
+}
+
+function editCurrent() {
+  if (currentEntryId) openEdit(currentEntryId);
+}
+
+function cancelEdit() {
+  backToList();
+}
+
+function saveEntry() {
+  const title = document.getElementById('title-input').value.trim();
+  const body = document.getElementById('body-input').value.trim();
+  if (!title && !body) { showToast('请写点什么再保存~'); return; }
+
+  const entries = getEntries();
+  if (editingId) {
+    const idx = entries.findIndex(e => e.id === editingId);
+    if (idx >= 0) {
+      entries[idx].title = title;
+      entries[idx].body = body;
+      entries[idx].author = currentAuthor;
+      entries[idx].updatedTs = Date.now();
+    }
+  } else {
+    entries.push({
+      id: 'e' + Date.now(),
+      author: currentAuthor,
+      title,
+      body,
+      ts: Date.now()
+    });
+  }
+  saveEntries(entries);
+  showToast('已保存 🐹');
+  currentTab = currentAuthor;
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    t.classList.toggle('active', (i===0&&currentTab==='shan')||(i===1&&currentTab==='ke'));
+  });
+  document.getElementById('list-title').textContent = currentTab === 'shan' ? 'DIARY · 姗' : 'DIARY · 小克';
+  backToList();
+}
+
+function openRead(id) {
+  const entry = getEntries().find(e => e.id === id);
+  if (!entry) return;
+  currentEntryId = id;
+
+  const badge = document.getElementById('read-author-badge');
+  badge.textContent = entry.author === 'shan' ? '姗' : '小克';
+  badge.className = 'read-author-badge ' + entry.author;
+
+  document.getElementById('read-date').textContent = formatDateFull(entry.ts);
+  document.getElementById('read-title').textContent = entry.title || '无标题';
+  document.getElementById('read-body').textContent = entry.body || '';
+  showView('read');
+}
+
+function deleteCurrent() {
+  if (currentEntryId) { deleteEntry(currentEntryId); backToList(); }
+}
+
+function deleteEntry(id) {
+  if (!confirm('确定删除这篇日记吗？')) return;
+  const entries = getEntries().filter(e => e.id !== id);
+  saveEntries(entries);
+  showToast('已删除');
+  renderList();
+}
+
+function backToList() {
+  renderList();
+  showView('list');
+}
+
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+}
+
+function setAuthor(a) {
+  currentAuthor = a;
+  document.getElementById('author-shan').classList.toggle('active', a==='shan');
+  document.getElementById('author-ke').classList.toggle('active', a==='ke');
+}
+
+function formatDate(ts) {
+  const d = new Date(ts);
+  return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function formatDateFull(ts) {
+  const d = new Date(ts);
+  const days = ['日','一','二','三','四','五','六'];
+  return `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日 · 星期${days[d.getDay()]}`;
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+renderList();
+</script>
+</body>
+</html>
